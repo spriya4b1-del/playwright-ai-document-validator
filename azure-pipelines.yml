@@ -1,0 +1,35 @@
+trigger:
+  - main   # run pipeline on pushes to main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+  # 1) Use Node.js 20.x
+  - task: NodeTool@0
+    displayName: 'Use Node.js 20.x'
+    inputs:
+      versionSpec: '20.x'
+
+  # 2) Install npm dependencies
+  - script: |
+      npm install
+    displayName: 'Install dependencies'
+
+  # 3) Install Playwright browsers (Chromium, Firefox, WebKit)
+  - script: |
+      npx playwright install --with-deps
+    displayName: 'Install Playwright browsers'
+
+  # 4) Run Playwright tests (UI + API)
+  - script: |
+      npx playwright test
+    displayName: 'Run Playwright tests'
+
+  # 5) Publish Playwright HTML report as pipeline artifact
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish Playwright HTML report'
+    inputs:
+      PathtoPublish: 'playwright-report'
+      ArtifactName: 'playwright-report'
+      publishLocation: 'Container'
