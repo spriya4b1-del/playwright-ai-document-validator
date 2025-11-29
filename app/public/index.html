@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>AI Document Validator</title>
+</head>
+<body>
+  <h1>AI Document Validator</h1>
+
+  <form id="uploadForm">
+    <input type="file" id="docInput" name="document" required />
+    <button type="submit">Analyze with AI</button>
+  </form>
+
+  <div id="loading" style="display:none;">Analyzing...</div>
+
+  <div id="results" style="display:none;">
+    <h2>Results</h2>
+    <p><strong>File:</strong> <span id="fileName"></span></p>
+    <p><strong>Type:</strong> <span id="docType"></span></p>
+    <p><strong>Confidence:</strong> <span id="confidence"></span></p>
+  </div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const loading = document.getElementById('loading');
+    const results = document.getElementById('results');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      loading.style.display = 'block';
+      results.style.display = 'none';
+
+      const input = document.getElementById('docInput');
+      const data = new FormData();
+      data.append('document', input.files[0]);
+
+      const res = await fetch('/api/analyze', {
+        method: 'POST',
+        body: data
+      });
+      const json = await res.json();
+
+      document.getElementById('fileName').textContent = json.fileName;
+      document.getElementById('docType').textContent = json.documentType;
+      document.getElementById('confidence').textContent = Math.round(json.confidence * 100) + "%";
+
+      loading.style.display = 'none';
+      results.style.display = 'block';
+    });
+  </script>
+</body>
+</html>
